@@ -5,13 +5,13 @@ import nltk
 
 sno = nltk.stem.SnowballStemmer('english')
 
-NEWLINE_CONSTANT = ' ada770804a0b11e5885dfeff819cdc9f '
+NEWLINE_CONSTANT = 'ada770804a0b11e5885dfeff819cdc9f'
 
 def main_program():
     with open('input/input.txt') as f:
         content = f.read()
 
-    content = content.replace('\n', NEWLINE_CONSTANT)
+    content = content.replace('\n', ' ' + str(NEWLINE_CONSTANT) + ' ')
     input_string = re.sub(r'([^\s\w]|_)+', '', content)
     input_string = input_string.lower()
 
@@ -22,7 +22,7 @@ def main_program():
 def list_subtraction(minuend, subtrahend):
     return [item for item in minuend if item not in subtrahend]
 
-def get_unigrams(sentence, get_base_words):
+def get_unigrams(sentence, get_base_words=False):
     tokens = nltk.word_tokenize(sentence)
 
     if get_base_words:
@@ -62,13 +62,12 @@ def get_ngram_for_string(input_string, ntype, get_base_words):
     ngram_tagcloud = tag_cloud(ngrams)
     ngram_no_newlines = []
     for (ngram, count) in ngram_tagcloud:
-        if ngram.find(NEWLINE_CONSTANT.strip()) == -1:
+        if ngram.find(NEWLINE_CONSTANT) == -1:
             ngram_no_newlines.append((ngram, count))
 
     tag_cloud_to_file(
         ngram_no_newlines,
         'output/' + str(ntype) + '_ngram_tagcloud.csv'
     )
-    return
 
 main_program()
