@@ -8,7 +8,7 @@ sno = nltk.stem.SnowballStemmer('english')
 NEWLINE_CONSTANT = ' ada770804a0b11e5885dfeff819cdc9f '
 
 def main_program():
-    with open('input.txt') as f:
+    with open('input/input.txt') as f:
         content = f.read()
 
     content = content.replace('\n', NEWLINE_CONSTANT)
@@ -65,7 +65,10 @@ def get_ngram_for_string(input_string, ntype, get_base_words):
         if ngram.find(NEWLINE_CONSTANT.strip()) == -1:
             ngram_no_newlines.append((ngram, count))
 
-    tag_cloud_to_file(ngram_no_newlines, str(ntype) + '_ngram_tagcloud.csv')
+    tag_cloud_to_file(
+        ngram_no_newlines,
+        'output/' + str(ntype) + '_ngram_tagcloud.csv'
+    )
     return
 
 main_program()
