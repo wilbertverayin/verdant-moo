@@ -3,10 +3,13 @@ import re
 import gzip
 import nltk
 
+NEWLINE_CONSTANT = ' ada770804a0b11e5885dfeff819cdc9f '
+
 def main_program():
     with open('input.txt') as f:
         content = f.read()
 
+    content = content.replace('\n', NEWLINE_CONSTANT)
     input_string = re.sub(r'([^\s\w]|_)+', '', content)
     input_string = input_string.lower()
 
@@ -40,20 +43,22 @@ def tag_cloud_to_file(tag_cloud, filename):
 
 def get_ngram_for_string(input_string, ntype):
     if ntype == 1:
-        filename = 'unigram'
         ngrams = get_unigrams(input_string)
     elif ntype == 2:
-        filename = 'bigram'
         ngrams = get_bigrams(input_string)
     elif ntype == 3:
-        filename = 'trigram'
         ngrams = get_trigrams(input_string)
     else:
         print ('not supported')
         return
 
     ngram_tagcloud = tag_cloud(ngrams)
-    tag_cloud_to_file(ngram_tagcloud, filename + '_tagcloud.csv')
+    ngram_no_newlines = []
+    for (ngram, count) in ngram_tagcloud:
+        if ngram.find(NEWLINE_CONSTANT.strip()) == -1:
+            ngram_no_newlines.append((ngram, count))
+
+    tag_cloud_to_file(ngram_no_newlines, str(ntype) + '_ngram_tagcloud.csv')
     return
 
 main_program()
