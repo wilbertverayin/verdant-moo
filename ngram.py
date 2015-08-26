@@ -3,21 +3,19 @@ import re
 import gzip
 import nltk
 
-sno = nltk.stem.SnowballStemmer('english')
+snowball_stemmer = nltk.stem.SnowballStemmer('english')
 
 NEWLINE_CONSTANT = 'ada770804a0b11e5885dfeff819cdc9f'
 
 def main_program():
-    with open('input/input.txt') as f:
-        content = f.read()
+    sentence_list = list(open('input/input.txt', 'r'))
 
-    content = content.replace('\n', ' ' + str(NEWLINE_CONSTANT) + ' ')
-    input_string = re.sub(r'([^\s\w]|_)+', '', content)
-    input_string = input_string.lower()
+    print('Type of sentence_list:')
+    print(type(sentence_list))
 
-    get_ngram_for_string(input_string, 1, True)
-    get_ngram_for_string(input_string, 2, True)
-    get_ngram_for_string(input_string, 3, True)
+    get_ngram_for_string(sentence_list, 1, True)
+    get_ngram_for_string(sentence_list, 2, True)
+    get_ngram_for_string(sentence_list, 3, True)
 
 def list_subtraction(minuend, subtrahend):
     return [item for item in minuend if item not in subtrahend]
@@ -26,7 +24,7 @@ def get_unigrams(sentence, get_base_words=False):
     tokens = nltk.word_tokenize(sentence)
 
     if get_base_words:
-        tokens = [sno.stem(token) for token in tokens]
+        tokens = [snowball_stemmer.stem(token) for token in tokens]
 
     stopwords = nltk.corpus.stopwords.words('english')
 
@@ -48,7 +46,14 @@ def tag_cloud_to_file(tag_cloud, filename):
         writer = csv.writer(file_path)
         writer.writerows(tag_cloud)
 
-def get_ngram_for_string(input_string, ntype, get_base_words):
+def join_sentence_list(sentence_list):
+    combined_string = (' ' + str(NEWLINE_CONSTANT) + ' ').join(sentence_list)
+    combined_string = re.sub(r'([^\s\w]|_)+', '', combined_string)
+    combined_string = combined_string.lower()
+    return combined_string
+
+def get_ngram_for_string(sentence_list, ntype, get_base_words):
+    input_string = join_sentence_list(sentence_list)
     if ntype == 1:
         ngrams = get_unigrams(input_string, get_base_words)
     elif ntype == 2:
@@ -70,4 +75,5 @@ def get_ngram_for_string(input_string, ntype, get_base_words):
         'output/' + str(ntype) + '_ngram_tagcloud.csv'
     )
 
-main_program()
+if main_program:
+    main_program()
