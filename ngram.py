@@ -5,8 +5,6 @@ import nltk
 
 snowball_stemmer = nltk.stem.SnowballStemmer('english')
 
-NEWLINE_CONSTANT = 'ada770804a0b11e5885dfeff819cdc9f'
-
 def main_program():
     sentence_list = list(open('input/input.txt', 'r'))
 
@@ -42,13 +40,12 @@ def tag_cloud(tokens):
     return nltk.FreqDist(tokens).items()
 
 def tag_cloud_to_file(tag_cloud, filename):
-    tag_cloud.sort()
     with open(filename, 'w', newline='') as file_path:
         writer = csv.writer(file_path)
         writer.writerows(tag_cloud)
 
 def join_sentence_list(sentence_list):
-    combined_string = (' ' + str(NEWLINE_CONSTANT) + ' ').join(sentence_list)
+    combined_string = (' ').join(sentence_list)
     combined_string = re.sub(r'([^\s\w]|_)+', '', combined_string)
     combined_string = combined_string.lower()
     return combined_string
@@ -72,7 +69,7 @@ def get_ngram_for_string(sentence_list, ntype, get_base_words):
             ngram_no_newlines.append((ngram, count))
 
     tag_cloud_to_file(
-        ngram_no_newlines,
+        ngram_tagcloud,
         'output/' + str(ntype) + '_ngram_tagcloud.csv'
     )
 
