@@ -42,6 +42,7 @@ def tag_cloud(tokens):
     return nltk.FreqDist(tokens).items()
 
 def tag_cloud_to_file(tag_cloud, filename):
+    tag_cloud.sort()
     with open(filename, 'w', newline='') as file_path:
         writer = csv.writer(file_path)
         writer.writerows(tag_cloud)
