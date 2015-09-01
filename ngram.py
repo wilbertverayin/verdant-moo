@@ -1,11 +1,14 @@
+from datetime import datetime
+
 import csv
 import re
 import gzip
 import nltk
 
-snowball_stemmer = nltk.stem.SnowballStemmer('english')
-
+STEMMED_WORDS = nltk.corpus.stopwords.words('english')
+SNOWBALL_STEMMER = nltk.stem.SnowballStemmer('english')
 NEWLINE_CONSTANT = 'ada770804a0b11e5885dfeff819cdc9f'
+unigram_cache = []
 
 def main_program():
     sentence_list = list(open('input/input.txt', 'r'))
@@ -21,14 +24,17 @@ def list_subtraction(minuend, subtrahend):
     return [item for item in minuend if item not in subtrahend]
 
 def get_unigrams(sentence, get_base_words=False):
-    tokens = nltk.word_tokenize(sentence)
+    global unigram_cache
+    if not unigram_cache:
+        tokens = nltk.word_tokenize(sentence)
 
-    if get_base_words:
-        tokens = [snowball_stemmer.stem(token) for token in tokens]
+        if get_base_words:
+            # tokens = [SNOWBALL_STEMMER.stem(token) for token in tokens]
+            tokens = map(SNOWBALL_STEMMER.stem, tokens)
 
-    stopwords = nltk.corpus.stopwords.words('english')
+        unigram_cache = list_subtraction(tokens, STEMMED_WORDS)
 
-    return list_subtraction(tokens, stopwords)
+    return unigram_cache
 
 def get_bigrams(sentence, get_base_words):
     nltk_bigrams = nltk.bigrams(get_unigrams(sentence, get_base_words))
@@ -41,8 +47,10 @@ def get_trigrams(sentence, get_base_words):
 def tag_cloud(tokens):
     return nltk.FreqDist(tokens).items()
 
-def tag_cloud_to_file(tag_cloud, filename):
-    tag_cloud.sort()
+def tag_cloud_to_file(tag_cloud, filename, sort_input=False):
+    if sort_input:
+        tag_cloud.sort()
+
     with open(filename, 'w', newline='') as file_path:
         writer = csv.writer(file_path)
         writer.writerows(tag_cloud)
@@ -69,13 +77,13 @@ def get_ngram_for_string(sentence_list, ntype, get_base_words):
 
     ngram_no_newlines = []
     for (ngram, count) in ngram_tagcloud:
-        if not NEWLINE_CONSTANT in ngram:
+        if NEWLINE_CONSTANT not in ngram:
             ngram_no_newlines.append((ngram, count))
 
-    tag_cloud_to_file(
-        ngram_no_newlines,
-        'output/' + str(ntype) + '_ngram_tagcloud.csv'
-    )
+    output_path = 'output/' + str(ntype) + '_ngram_tagcloud.csv'
+    tag_cloud_to_file(ngram_no_newlines, output_path)
 
-if main_program:
+if __name__ == '__main__':
+    startTime = datetime.now()
     main_program()
+    print (datetime.now() - startTime)
